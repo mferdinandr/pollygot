@@ -101,7 +101,7 @@ const Home = () => {
     <Layout>
       <div className="h-full overflow-y-auto">
         <Tabs defaultValue="translate" className="p-2 w-full">
-          <TabsList>
+          <TabsList className={"fixed z-10"}>
             <TabsTrigger value="translate">Translate</TabsTrigger>
             <TabsTrigger value="chat">Chat</TabsTrigger>
           </TabsList>
@@ -110,7 +110,9 @@ const Home = () => {
             className="justify-between h-screen flex flex-1 flex-col"
           >
             <form onSubmit={handleSubmit}>
-              <h1 className="font-bold text-xl py-1">Text To Translate</h1>
+              <h1 className="font-bold text-xl py-1 mt-11">
+                Text To Translate
+              </h1>
               <textarea
                 placeholder="Insert your chat!"
                 className="bg-black/10 w-full h-[100px] rounded-md p-2"
@@ -134,8 +136,8 @@ const Home = () => {
               <Output content={translatedText} />
             </form>
           </TabsContent>
-          <TabsContent value="chat" className={"flex flex-col"}>
-            <div>
+          <TabsContent value="chat" className={"flex flex-col relative"}>
+            <div className="mt-9 mb-12">
               {messages.map((message, index) => (
                 <BubbleChat key={index} isUser={message.isUser}>
                   {message.content}
@@ -143,7 +145,10 @@ const Home = () => {
               ))}
             </div>
 
-            <form className="flex gap-3" onSubmit={handleSendMessage}>
+            <form
+              className="flex fixed bottom-[21px] py-2 px-3 right-7 rounded-md bg-white left-4 gap-3"
+              onSubmit={handleSendMessage}
+            >
               <input
                 type="text"
                 className="border w-full rounded-sm border-black p-2 text-sm"
