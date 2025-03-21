@@ -87,7 +87,7 @@ const Home = () => {
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: messages,
-        temperature: 1.2,
+        temperature: 1.5,
         max_tokens: 250,
       });
       setMessages((prevMessages) => [
@@ -138,7 +138,10 @@ const Home = () => {
               <Output content={translatedText} />
             </form>
           </TabsContent>
-          <TabsContent value="chat" className={"flex flex-col relative"}>
+          <TabsContent
+            value="chat"
+            className={"flex flex-col relative overflow-y-scroll"}
+          >
             <div className="mt-9 mb-12">
               {messages.map((message, index) => (
                 <BubbleChat key={index} isUser={message.isUser}>
