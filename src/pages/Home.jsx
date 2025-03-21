@@ -4,11 +4,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Combobox } from "@/components/combobox";
 import { OpenAI } from "openai";
 import Output from "@/components/output";
+import BubbleChat from "@/components/bubbleChat";
 
 const Home = () => {
   const [text, setText] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [translatedText, setTranslatedText] = useState("");
+
+  const [chatText, setChatText] = useState("");
+  const [messages, setMessages] = useState([]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -17,10 +21,24 @@ const Home = () => {
       return;
     }
 
-    fetchReport({ text, selectedLanguage });
+    fetchTranslate({ text, selectedLanguage });
   };
 
-  async function fetchReport({ text, selectedLanguage }) {
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+
+    if (!chatText) {
+      return;
+    }
+
+    fetchChat({ chat: chatText });
+    setMessages([...messages, { content: chatText, isUser: true }]);
+    setChatText("");
+  };
+
+  console.log("haha", messages);
+
+  async function fetchTranslate({ text, selectedLanguage }) {
     const messages = [
       {
         role: "system",
@@ -45,6 +63,37 @@ const Home = () => {
       setTranslatedText(response.choices[0].message.content);
     } catch (err) {
       console.log("Error:", err);
+    }
+  }
+
+  async function fetchChat({ chat }) {
+    const messages = [
+      {
+        role: "system",
+        content:
+          "You are a practitioner who can converse in multiple languages as per the user's preference. Simply respond in the same language the user uses",
+      },
+      {
+        role: "user",
+        content: chat,
+      },
+    ];
+
+    try {
+      const openai = new OpenAI({
+        apiKey: import.meta.env.VITE_OPENAI_API,
+        dangerouslyAllowBrowser: true,
+      });
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: messages,
+      });
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { content: response.choices[0].message.content, isUser: false },
+      ]);
+    } catch (err) {
+      console.log("Error : ", err);
     }
   }
 
@@ -85,7 +134,25 @@ const Home = () => {
               <Output content={translatedText} />
             </form>
           </TabsContent>
-          <TabsContent value="chat">Change your password here.</TabsContent>
+          <TabsContent value="chat" className={"flex flex-col"}>
+            <div>
+              {messages.map((message, index) => (
+                <BubbleChat key={index} isUser={message.isUser}>
+                  {message.content}
+                </BubbleChat>
+              ))}
+            </div>
+
+            <form className="flex gap-3" onSubmit={handleSendMessage}>
+              <input
+                type="text"
+                className="border w-full rounded-sm border-black p-2 text-sm"
+                value={chatText}
+                onChange={(value) => setChatText(value.target.value)}
+              />
+              <button className="bg-cyan-500 px-4 py-1 rounded-lg">Send</button>
+            </form>
+          </TabsContent>
         </Tabs>
       </div>
     </Layout>
