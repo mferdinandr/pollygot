@@ -36,8 +36,6 @@ const Home = () => {
     setChatText("");
   };
 
-  console.log("haha", messages);
-
   async function fetchTranslate({ text, selectedLanguage }) {
     const messages = [
       {
@@ -59,6 +57,8 @@ const Home = () => {
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: messages,
+        temperature: 1.1,
+        max_tokens: 250,
       });
       setTranslatedText(response.choices[0].message.content);
     } catch (err) {
@@ -87,6 +87,8 @@ const Home = () => {
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: messages,
+        temperature: 1.2,
+        max_tokens: 250,
       });
       setMessages((prevMessages) => [
         ...prevMessages,
